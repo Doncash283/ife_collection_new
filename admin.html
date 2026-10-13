@@ -155,6 +155,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script>
+    (() => {
     const config = window.IFE_CONFIG || {};
     const loginSection = document.getElementById("login-section");
     const dashboard = document.getElementById("dashboard");
@@ -394,8 +395,9 @@
       supabase.auth.onAuthStateChange(() => {
         setTimeout(checkAdmin, 0);
       });
-      checkAdmin();
+           checkAdmin();
     }
+    })();
   </script>
 </body>
 </html>
