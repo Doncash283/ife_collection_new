@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c32">
+  <title>Ife Collection | Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:#173c32; --green2:#315c4c; --cream:#f8f5ee;
+      --paper:#fffdf8; --gold:#bd8d55; --ink:#25352d;
+      --muted:#7c8279; --line:#e8e2d7; --red:#a33b36;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--cream); color:var(--ink); font-family:"DM Sans",sans-serif; }
+    button,input,textarea,select { font:inherit; }
+    button { cursor:pointer; }
+    header { background:var(--green); color:white; padding:18px 22px; }
+    .header-inner { max-width:1100px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:15px; }
+    .brand { font:24px "Playfair Display",serif; }
+    .brand small { display:block; font:10px "DM Sans",sans-serif; letter-spacing:2px; margin-top:4px; color:#d8e0d9; }
+    a { color:inherit; }
+    main { max-width:1100px; padding:30px 18px 65px; margin:auto; }
+    h1,h2,h3 { font-family:"Playfair Display",serif; font-weight:500; }
+    h1 { color:var(--green); font-size:36px; margin:0 0 8px; }
+    h2 { color:var(--green); font-size:25px; margin-top:0; }
+    p { line-height:1.7; }
+    .muted { color:var(--muted); font-size:13px; }
+    .panel { background:var(--paper); border:1px solid var(--line); padding:23px; margin-top:22px; border-radius:5px; }
+    .login { max-width:440px; margin:55px auto; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; }
+    label { display:block; font-size:12px; font-weight:700; color:var(--green); }
+    input,textarea,select { width:100%; margin-top:7px; padding:12px; border:1px solid var(--line); border-radius:3px; background:white; color:var(--ink); }
+    textarea { min-height:95px; resize:vertical; }
+    .full { grid-column:1/-1; }
+    .btn { padding:12px 16px; border:1px solid var(--green); background:var(--green); color:white; border-radius:3px; font-size:12px; font-weight:700; }
+    .btn:hover { background:var(--green2); }
+    .btn.secondary { background:transparent; color:var(--green); }
+    .btn.danger { background:var(--red); border-color:var(--red); }
+    .btn:disabled { opacity:.55; cursor:wait; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .notice { padding:12px; background:#f1ede3; color:var(--green); font-size:13px; line-height:1.6; margin-top:14px; border-radius:3px; overflow-wrap:anywhere; }
+    .notice.error { background:#f8e8e5; color:#8a2f2b; }
+    .hidden { display:none !important; }
+    .products { display:grid; gap:12px; }
+    .product { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .product img { width:65px; height:75px; object-fit:cover; background:var(--cream); }
+    .product-info { flex:1; min-width:0; }
+    .product-info strong { color:var(--green); }
+    .product-info p { font-size:12px; color:var(--muted); margin:5px 0; }
+    .product-actions { display:flex; gap:7px; flex-wrap:wrap; }
+    .product-actions button { padding:8px 10px; font-size:11px; }
+    .status { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--gold); }
+    .help { font-size:11px; color:var(--muted); }
+    @media(max-width:650px) {
+      .form-grid { grid-template-columns:1fr; }
+      .full { grid-column:auto; }
+      .panel { padding:16px; }
+      .product { align-items:flex-start; flex-wrap:wrap; }
+      .product-actions { width:100%; padding-left:78px; }
+      h1 { font-size:31px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">Ife Collection<small>PRIVATE ADMINISTRATION</small></div>
+      <a href="./" style="font-size:12px">View storefront ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="login-section" class="panel login">
+      <div class="status">ADMIN ACCESS</div>
+      <h1>Welcome back.</h1>
+      <p class="muted">Sign in to manage your Ife Collection products.</p>
+      <form id="login-form">
+        <label>Email address
+          <input name="email" type="email" autocomplete="username" required placeholder="Your admin email">
+        </label>
+        <label style="margin-top:15px">Password
+          <input name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+        </label>
+        <button class="btn" style="width:100%;margin-top:18px" type="submit">Sign in securely</button>
+      </form>
+      <div id="login-message" class="notice hidden" role="status"></div>
+      <p class="help">Admin access must be created and authorized in Supabase before product management will work.</p>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="row">
+        <div>
+          <div class="status">YOUR STORE</div>
+          <h1>Product studio.</h1>
+          <p class="muted">Add lovely finds, update stock and keep your collection fresh.</p>
+        </div>
+        <button class="btn secondary" id="logout-button" type="button">Sign out</button>
+      </div>
+
+      <div class="panel">
+        <h2 id="form-title">Add a new product</h2>
+        <form id="product-form" class="form-grid">
+          <label>Product name
+            <input name="name" required maxlength="120" placeholder="e.g. USB Sunset Lamp">
+          </label>
+          <label>Category
+            <select name="category" required>
+              <option value="Beauty">Beauty</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Home Decor">Home Decor</option>
+            </select>
+          </label>
+          <label>Price (₦)
+            <input name="price" type="number" min="0" step="1" required placeholder="5000">
+          </label>
+          <label>Compare-at price (₦, optional)
+            <input name="compare_at_price" type="number" min="0" step="1" placeholder="6000">
+          </label>
+          <label>Stock quantity
+            <input name="stock" type="number" min="0" step="1" required value="1">
+          </label>
+          <label>Product image URL
+            <input name="image_url" type="url" placeholder="https://..." >
+          </label>
+          <label class="full">Description
+            <textarea name="description" maxlength="1500" placeholder="Describe your product..."></textarea>
+          </label>
+          <label class="full" style="display:flex;align-items:center;gap:9px">
+            <input name="featured" type="checkbox" style="width:auto;margin:0">
+            Feature this product on the storefront
+          </label>
+          <div class="full row">
+            <button class="btn" id="save-button" type="submit">Save product</button>
+            <button class="btn secondary hidden" id="cancel-edit" type="button">Cancel edit</button>
+          </div>
+        </form>
+        <div id="product-message" class="notice hidden" role="status"></div>
+        <p class="help">For now, use a publicly accessible image URL. We can add direct photo uploads after configuring secure storage.</p>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <div><h2 style="margin-bottom:4px">Your products</h2><div class="muted" id="product-count">Loading products…</div></div>
+          <button class="btn secondary" id="refresh-button" type="button">Refresh</button>
+        </div>
+        <div id="product-list" class="products" style="margin-top:18px"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const config = window.IFE_CONFIG || {};
+    const loginSection = document.getElementById("login-section");
+    const dashboard = document.getElementById("dashboard");
+    const loginMessage = document.getElementById("login-message");
+    const productMessage = document.getElementById("product-message");
+    const productForm = document.getElementById("product-form");
+    const productList = document.getElementById("product-list");
+    let supabase = null;
+    let currentUser = null;
+    let editingId = null;
+    let products = [];
+
+    function showMessage(element, message, error = false) {
+      element.textContent = message;
+      element.classList.remove("hidden", "error");
+      if (error) element.classList.add("error");
+    }
+    function hideMessage(element) {
+      element.textContent = "";
+      element.classList.add("hidden");
+      element.classList.remove("error");
+    }
+    function setBusy(button, busy, label) {
+      button.disabled = busy;
+      if (busy) {
+        button.dataset.oldLabel = button.textContent;
+        button.textContent = label || "Please wait…";
+      } else {
+        button.textContent = button.dataset.oldLabel || label || "Save";
+      }
+    }
+    function money(value) {
+      return "₦" + Number(value || 0).toLocaleString("en-NG");
+    }
+    function safeText(value) {
+      return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      })[c]);
+    }
+
+    if (window.supabase && config.SUPABASE_URL && config.SUPABASE_KEY) {
+      supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_KEY);
+    } else {
+      showMessage(loginMessage, "Supabase settings or the Supabase client could not load. Check config.js and your internet connection.", true);
+    }
+
+    async function checkAdmin() {
+      if (!supabase) return;
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        showMessage(loginMessage, error.message, true);
+        return;
+      }
+      if (!session) {
+        loginSection.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        return;
+      }
+      currentUser = session.user;
+      const { data, error: adminError } = await supabase
+        .from("ife_admins")
+        .select("user_id")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (adminError || !data) {
+        await supabase.auth.signOut();
+        currentUser = null;
+        loginSection.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        showMessage(loginMessage, adminError
+          ? "Could not verify admin access. Check the database policies."
+          : "This account is not authorized as a store admin.", true);
+        return;
+      }
+      hideMessage(loginMessage);
+      loginSection.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      await loadProducts();
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!supabase) return;
+      hideMessage(loginMessage);
+      const button = event.currentTarget.querySelector("button[type=submit]");
+      setBusy(button, true, "Signing in…");
+      try {
+        const form = new FormData(event.currentTarget);
+        const { error } = await supabase.auth.signInWithPassword({
+          email: String(form.get("email")).trim(),
+          password: String(form.get("password"))
+        });
+        if (error) throw error;
+        await checkAdmin();
+      } catch (error) {
+        showMessage(loginMessage, error.message || "Sign-in failed.", true);
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    async function loadProducts() {
+      hideMessage(productMessage);
+      productList.textContent = "Loading products…";
+      const { data, error } = await supabase
+        .from("ife_products")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) {
+        productList.textContent = "";
+        showMessage(productMessage, "Could not load products: " + error.message, true);
+        return;
+      }
+      products = data || [];
+      document.getElementById("product-count").textContent = products.length + " product(s), including archived items.";
+      if (!products.length) {
+        productList.textContent = "No products yet. Add your first product above.";
+        return;
+      }
+      productList.innerHTML = products.map(p => `
+        <article class="product">
+          <img src="${safeText(p.image_url || "")}" alt="" onerror="this.style.visibility='hidden'">
+          <div class="product-info">
+            <strong>${safeText(p.name)}</strong>
+            <p>${safeText(p.category)} · ${money(p.price)} · Stock: ${p.stock}</p>
+            <span class="status">${p.archived ? "Archived" : p.stock > 0 ? "Available" : "Out of stock"}</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn secondary" data-edit="${safeText(p.id)}" type="button">Edit</button>
+            <button class="btn ${p.archived ? "secondary" : "danger"}" data-archive="${safeText(p.id)}" type="button">${p.archived ? "Restore" : "Archive"}</button>
+          </div>
+        </article>`).join("");
+    }
+
+    productList.addEventListener("click", async event => {
+      const editButton = event.target.closest("[data-edit]");
+      const archiveButton = event.target.closest("[data-archive]");
+      if (editButton) {
+        const p = products.find(item => item.id === editButton.dataset.edit);
+        if (!p) return;
+        editingId = p.id;
+        for (const field of ["name","category","price","compare_at_price","stock","image_url","description","featured"]) {
+          const input = productForm.elements[field];
+          if (field === "featured") input.checked = Boolean(p[field]);
+          else input.value = p[field] ?? "";
+        }
+        document.getElementById("form-title").textContent = "Edit product";
+        document.getElementById("save-button").textContent = "Update product";
+        document.getElementById("cancel-edit").classList.remove("hidden");
+        productForm.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+      if (archiveButton) {
+        const p = products.find(item => item.id === archiveButton.dataset.archive);
+        if (!p) return;
+        const action = p.archived ? "restore" : "archive";
+        if (!confirm("Are you sure you want to " + action + " “" + p.name + "”?")) return;
+        const { error } = await supabase.from("ife_products")
+          .update({ archived: !p.archived, updated_at: new Date().toISOString() })
+          .eq("id", p.id);
+        if (error) showMessage(productMessage, "Could not update product: " + error.message, true);
+        else await loadProducts();
+      }
+    });
+
+    productForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      hideMessage(productMessage);
+      const button = document.getElementById("save-button");
+      setBusy(button, true, "Saving…");
+      const form = new FormData(productForm);
+      const price = Number(form.get("price"));
+      const stock = Number(form.get("stock"));
+      const compareRaw = String(form.get("compare_at_price") || "").trim();
+      const image = String(form.get("image_url") || "").trim();
+      const payload = {
+        name: String(form.get("name") || "").trim(),
+        category: String(form.get("category") || ""),
+        price,
+        compare_at_price: compareRaw === "" ? null : Number(compareRaw),
+        stock,
+        image_url: image,
+        description: String(form.get("description") || "").trim(),
+        featured: productForm.elements.featured.checked,
+        updated_at: new Date().toISOString()
+      };
+      if (!payload.name || !Number.isSafeInteger(price) || price < 0 ||
+          !Number.isSafeInteger(stock) || stock < 0 ||
+          (payload.compare_at_price !== null &&
+          (!Number.isSafeInteger(payload.compare_at_price) || payload.compare_at_price < 0))) {
+        showMessage(productMessage, "Check the name, price, stock and compare-at price. Prices and stock must be whole non-negative numbers.", true);
+        setBusy(button, false);
+        return;
+      }
+      if (image && !/^https:\/\//i.test(image)) {
+        showMessage(productMessage, "Please use an image URL beginning with https://", true);
+        setBusy(button, false);
+        return;
+      }
+      try {
+        let result;
+        if (editingId) {
+          result = await supabase.from("ife_products").update(payload).eq("id", editingId);
+        } else {
+          result = await supabase.from("ife_products").insert(payload);
+        }
+        if (result.error) throw result.error;
+        showMessage(productMessage, editingId ? "Product updated successfully." : "Product added successfully.");
+        resetProductForm();
+        await loadProducts();
+      } catch (error) {
+        showMessage(productMessage, "Could not save product: " + error.message, true);
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    function resetProductForm() {
+      productForm.reset();
+      productForm.elements.stock.value = 1;
+      editingId = null;
+      document.getElementById("form-title").textContent = "Add a new product";
+      document.getElementById("save-button").textContent = "Save product";
+      document.getElementById("cancel-edit").classList.add("hidden");
+    }
+    document.getElementById("cancel-edit").addEventListener("click", resetProductForm);
+    document.getElementById("refresh-button").addEventListener("click", loadProducts);
+    document.getElementById("logout-button").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      currentUser = null;
+      dashboard.classList.add("hidden");
+      loginSection.classList.remove("hidden");
+      resetProductForm();
+    });
+
+    if (supabase) {
+      supabase.auth.onAuthStateChange(() => {
+        setTimeout(checkAdmin, 0);
+      });
+      checkAdmin();
+    }
+  </script>
+</body>
+</html>
